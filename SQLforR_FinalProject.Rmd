@@ -123,9 +123,6 @@ con.text <- paste("CData DB2 Source;DRIVER=",driver.name,
 
 conn <- odbcConnect(con.text)
 
-data <- sqlTables(conn) %>%
-  filter(TABLE_SCHEM == "VKJ26480")
-
 knitr::opts_chunk$set(connection = "conn")
 
 ```
@@ -243,6 +240,8 @@ DAILY_FX <- read.csv('https://cf-courses-data.s3.us.cloud-object-storage.appdoma
 
 MONTHLY_FX <- read.csv('https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-RP0203EN-SkillsNetwork/labs/Final%20Project/Monthly_FX.csv')
 
+ls()[sapply(ls(), function(i) class(get(i))) == "data.frame"]
+
 ```
 
 (CONTINUED ON NEXT PAGE ->)
@@ -282,7 +281,7 @@ head(MONTHLY_FX)
 ## Problem 2: Read Datasets and Load Tables
 You will read the datasets directly into R dataframes using the urls provided above, and use these to load the tables you created.
 
-```{r Exercise2_Problem1, eval=FALSE}
+```{r Exercise2_Problem2, eval=FALSE}
 
 sqlSave(conn, CROP_DATA, tablename = "CROP_DATA", append = FALSE,rownames = FALSE, colnames = FALSE,safer=FALSE,fast=FALSE)
 
@@ -296,7 +295,7 @@ sqlSave(conn, MONTHLY_FX, tablename = "MONTHLY_FX", append = FALSE,rownames = FA
 
 ### Confirm that Tables are Loaded
 
-```{r Exercise2_Problem1_view}
+```{r Exercise2_Problem2_view}
 
 data <- sqlTables(conn) %>%
   filter(TABLE_SCHEM == "VKJ26480") %>%
@@ -339,7 +338,7 @@ sqlQuery(conn,"SELECT HARVESTED_AREA FROM CROP_DATA
 
 ```
 
-```{r Exercise3_Problem5_run, include=FALSE}
+```{r Exercise3_Problem5_run, echo=FALSE}
 
 sqlQuery(conn,"SELECT HARVESTED_AREA FROM CROP_DATA WHERE YEAR='1968-12-31' and CROP_TYPE='Rye' and GEO='Canada'")
 
