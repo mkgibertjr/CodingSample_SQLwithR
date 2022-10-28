@@ -462,8 +462,6 @@ sqlQuery(conn,"SELECT CROP_TYPE,GEO,AVG(AVG_YIELD) AS TEN_YEAR_AVG_YIELD FROM CR
 
 ```
 
-\pagebreak
-
 ## Problem 12: Use a subquery to determine how much wheat was harvested in Canada in the most recent year of the data.
 
 ANSWER: 35,183,000 metric tons of wheat were harvested in Canada in the most recent year of the data (2020) from over 10,017,800 hectares of harvested land.
@@ -473,6 +471,8 @@ ANSWER: 35,183,000 metric tons of wheat were harvested in Canada in the most rec
 sqlQuery(conn,"SELECT * FROM CROP_DATA WHERE GEO='Canada' and CROP_TYPE='Wheat' and YEAR = (SELECT MAX(YEAR) FROM CROP_DATA)")
 
 ```
+
+\pagebreak
 
 ## Problem 13: Use an implicit inner join to calculate the monthly price per metric tonne of Canola grown in Saskatchewan in both Canadian and US dollars. Display the most recent 6 months of the data.
 
