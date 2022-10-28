@@ -210,27 +210,95 @@ Establish a connection to the Db2 database, and create the following four tables
 
 The previous practice lab will help you accomplish this.
 
-```{r Exercise2_datadownload_RUN, eval=FALSE,message = FALSE}
+```{r Exercise2_Problem1, eval=FALSE}
+
+sqlQuery(conn,"CREATE TABLE CROP_DATA (
+    CD_ID int,
+    YEAR DATE,
+    CROP_TYPE varchar(255),
+    GEO varchar(255),
+    SEEDED_AREA int,
+    HARVESTED_AREA int,
+    PRODUCTION int,
+    AVG_YIELD int
+)")
+
+sqlQuery(conn,"CREATE TABLE FARM_PRICES (
+    CD_ID int,
+    DATE DATE,
+    CROP_TYPE varchar(255),
+    GEO varchar(255),
+    PRICE_PRERMT int
+)")
+
+sqlQuery(conn,"CREATE TABLE DAILY_FX (
+    DFX_ID int,
+    DATE DATE,
+    FXUSDCAD DEC(1,4)
+)")
+
+sqlQuery(conn,"CREATE TABLE MONTHLY_FX (
+    DFX_ID int,
+    DATE DATE,
+    FXUSDCAD DEC(1,6)
+)")
+
+```
+
+```{r Exercise2_Problem1_read,echo=FALSE}
+
+data <- sqlTables(conn) %>%
+  filter(TABLE_SCHEM == "VKJ26480") %>%
+  select(TABLE_CAT,TABLE_NAME)
+
+data
+
+```
+
+## Problem 2: Read Datasets and Load Tables
+You will read the datasets directly into R dataframes using the urls provided above, and use these to load the tables you created.
+
+```{r Exercise2_Problem2, eval=FALSE}
 
 CROP_DATA <- read.csv('https://cf-courses-data.s3.us.cloud-object-storage.
                       appdomain.cloud/IBM-RP0203EN-SkillsNetwork/labs/
                       Final%20Project/Annual_Crop_Data.csv')
 
+sqlSave(conn, CROP_DATA, tablename = "CROP_DATA", append = FALSE,rownames = FALSE, colnames = FALSE,safer=FALSE,fast=FALSE)
+
 FARM_PRICES <- read.csv('https://cf-courses-data.s3.us.cloud-object-storage.
                         appdomain.cloud/IBM-RP0203EN-SkillsNetwork/labs/
                         Final%20Project/Monthly_Farm_Prices.csv')
+
+sqlSave(conn, FARM_PRICES, tablename = "FARM_PRICES", append = FALSE,rownames = FALSE, colnames = FALSE,safer=FALSE,fast=FALSE)
 
 DAILY_FX <- read.csv('https://cf-courses-data.s3.us.cloud-object-storage.
                      appdomain.cloud/IBM-RP0203EN-SkillsNetwork/labs/
                      Final%20Project/Daily_FX.csv')
 
+sqlSave(conn, DAILY_FX, tablename = "DAILY_FX", append = FALSE,rownames = FALSE, colnames = FALSE,safer=FALSE,fast=FALSE)
+
 MONTHLY_FX <- read.csv('https://cf-courses-data.s3.us.cloud-object-storage.
                        appdomain.cloud/IBM-RP0203EN-SkillsNetwork/labs/
                        Final%20Project/Monthly_FX.csv')
 
+sqlSave(conn, MONTHLY_FX, tablename = "MONTHLY_FX", append = FALSE,rownames = FALSE, colnames = FALSE,safer=FALSE,fast=FALSE) 
+
+## Show data frames
+
+ls()[sapply(ls(), function(i) class(get(i))) == "data.frame"]
+
+## Show Tables in Database
+
+data <- sqlTables(conn) %>%
+  filter(TABLE_SCHEM == "VKJ26480") %>%
+  select(TABLE_CAT,TABLE_NAME)
+
+data
+
 ```
 
-```{r Exercise2_datadownload_run, echo = FALSE}
+```{r Exercise2_Problem2_readcsv, echo=FALSE, message=FALSE}
 
 CROP_DATA <- read.csv('https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-RP0203EN-SkillsNetwork/labs/Final%20Project/Annual_Crop_Data.csv')
 
@@ -240,48 +308,9 @@ DAILY_FX <- read.csv('https://cf-courses-data.s3.us.cloud-object-storage.appdoma
 
 MONTHLY_FX <- read.csv('https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-RP0203EN-SkillsNetwork/labs/Final%20Project/Monthly_FX.csv')
 
-ls()[sapply(ls(), function(i) class(get(i))) == "data.frame"]
-
 ```
 
-(CONTINUED ON NEXT PAGE ->)
-
-\pagebreak
-
-### Check Data Integrity
-
-```{r crop_data}
-
-head(CROP_DATA)
-
-```
-
-```{r farm_prices}
-
-head(FARM_PRICES)
-
-```
-
-```{r daily_fx}
-
-head(DAILY_FX)
-
-```
-
-```{r monthly_fx}
-
-head(MONTHLY_FX)
-
-```
-
-(CONTINUED ON NEXT PAGE ->)
-
-\pagebreak
-
-## Problem 2: Read Datasets and Load Tables
-You will read the datasets directly into R dataframes using the urls provided above, and use these to load the tables you created.
-
-```{r Exercise2_Problem2, eval=FALSE}
+```{r Exercise2_Problem2_sqlSave, echo=FALSE,eval=FALSE}
 
 sqlSave(conn, CROP_DATA, tablename = "CROP_DATA", append = FALSE,rownames = FALSE, colnames = FALSE,safer=FALSE,fast=FALSE)
 
@@ -293,16 +322,19 @@ sqlSave(conn, MONTHLY_FX, tablename = "MONTHLY_FX", append = FALSE,rownames = FA
 
 ```
 
-### Confirm that Tables are Loaded
+```{r Exercise2_Problem2_dataintegrity, echo=FALSE}
 
-```{r Exercise2_Problem2_view}
+## Show data frames
+
+ls()[sapply(ls(), function(i) class(get(i))) == "data.frame"]
+
+## Show Tables in Database
 
 data <- sqlTables(conn) %>%
   filter(TABLE_SCHEM == "VKJ26480") %>%
   select(TABLE_CAT,TABLE_NAME)
 
 data
-
 ```
 
 # Exercise 3: Execute SQL queries using the RODBC R package
@@ -350,9 +382,11 @@ ANSWER:  Below are the first six rows of the farm_prices table for Rye.
 
 ```{r Exercise3_Problem6}
 
-sqlQuery(conn,"SELECT * FROM CROP_DATA WHERE CROP_TYPE='Rye' LIMIT 6")
+sqlQuery(conn,"SELECT * FROM FARM_PRICES WHERE CROP_TYPE='Rye' LIMIT 6")
 
 ```
+
+\pagebreak
 
 ## Problem 7: Which provinces grew Barley?
 
@@ -371,14 +405,7 @@ ANSWER:  The table contains information on farm prices from 1965-2020.
 
 ```{r Exercise3_Problem8_first}
 
-sqlQuery(conn,"SELECT DISTINCT YEAR FROM CROP_DATA ORDER BY YEAR ASC LIMIT 1")
-
-```
-
-```{r Exercise3_Problem8_last}
-
-sqlQuery(conn,
-    "SELECT DISTINCT YEAR FROM CROP_DATA ORDER BY YEAR DESC LIMIT 1")
+sqlQuery(conn,"SELECT MAX(DATE),MIN(DATE) FROM FARM_PRICES")
 
 ```
 
@@ -411,23 +438,26 @@ sqlQuery(conn,"SELECT * FROM CROP_DATA WHERE GEO = 'Saskatchewan' and YEAR = '20
 
 ```
 
+\pagebreak
+
 ## Problem 11: Rank the crops and geographies by their average yield (KG per hectare) since the year 2000. Which crop and province had the highest average yield since the year 2000?
 
 ANSWER:  Barley in Alberta performed best, with an average yield of 4100 in 2013 and 2016 and a average yield sum of 72,465 since 2000.
 
 ```{r Exercise3_Problem11_ranked,eval=FALSE}
 
-sqlQuery(conn,
-    "SELECT * FROM CROP_DATA 
-     WHERE YEAR >= '2000-12-31' 
-     ORDER BY AVG_YIELD DESC
-     LIMIT 10")
+sqlQuery(conn,"
+         SELECT CROP_TYPE,GEO,
+         AVG(AVG_YIELD) AS TEN_YEAR_AVG_YIELD 
+         FROM CROP_DATA 
+         WHERE YEAR >= '2000-12-31' 
+         GROUP BY CROP_TYPE,GEO")
 
 ```
 
 ```{r Exercise3_Problem11_ranked_run, echo=FALSE}
 
-sqlQuery(conn,"SELECT * FROM CROP_DATA WHERE YEAR >= '2000-12-31' ORDER BY AVG_YIELD DESC LIMIT 10")
+sqlQuery(conn,"SELECT CROP_TYPE,GEO,AVG(AVG_YIELD) AS TEN_YEAR_AVG_YIELD FROM CROP_DATA WHERE YEAR >= '2000-12-31' GROUP BY CROP_TYPE,GEO")
 
 ```
 
@@ -448,24 +478,15 @@ sqlQuery(conn,"SELECT CROP_TYPE,GEO,SUM(AVG_YIELD) FROM CROP_DATA WHERE YEAR >= 
 
 ```
 
+\pagebreak
+
 ## Problem 12: Use a subquery to determine how much wheat was harvested in Canada in the most recent year of the data.
 
-ANSWER: 35,183,000 metric tons of wheat were harvested in Canada in the most recent year of the data (2020).
+ANSWER: 35,183,000 metric tons of wheat were harvested in Canada in the most recent year of the data (2020) from over 10,017,800 hectares of harvested land.
 
-```{r Exercise3_Problem12,eval=FALSE}
+```{r Exercise3_Problem12_run}
 
-sqlQuery(conn,
-    "SELECT YEAR,GEO,CROP_TYPE,PRODUCTION 
-     FROM CROP_DATA 
-     WHERE GEO='Canada' and CROP_TYPE='Wheat' 
-     ORDER BY YEAR DESC 
-     LIMIT 1")
-
-```
-
-```{r Exercise3_Problem12_run,echo=FALSE}
-
-sqlQuery(conn,"SELECT YEAR,GEO,CROP_TYPE,PRODUCTION FROM CROP_DATA WHERE GEO='Canada' and CROP_TYPE='Wheat' ORDER BY YEAR DESC LIMIT 1")
+sqlQuery(conn,"SELECT * FROM CROP_DATA WHERE GEO='Canada' and CROP_TYPE='Wheat' and YEAR = (SELECT MAX(YEAR) FROM CROP_DATA)")
 
 ```
 
