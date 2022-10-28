@@ -65,10 +65,10 @@ knitr::opts_chunk$set(echo = TRUE,tidy=TRUE, tidy.opts=list(width.cutoff=60))
 
 driver.name <- "DB2"
 db.name <- "BLUDB"
-host.name <- "19af6446-6171-4641-8aba-9dcff8e1b6ff.c1ogj3sd0tgtu0lqde00.databases.appdomain.cloud"
+host.name <- "<YOURHOSTNAMEHERE>"
 port <-"30699" # 50000 if not using SSL or 50001 if using SSL
-user.name <-"vkj26480"
-user.pwd <- "PjtfHxJhreFiR28i"
+user.name <-"<YOURUSERNAMEHERE>"
+user.pwd <- "<YOURPASSWORDHERE>"
 con.text <- paste("CData DB2 Source;DRIVER=",driver.name,
                   ";Database=",db.name,
                   ";Hostname=",host.name,
@@ -108,11 +108,10 @@ knitr::opts_chunk$set(echo = TRUE,tidy=TRUE, tidy.opts=list(width.cutoff=60))
 
 driver.name <- "DB2"
 db.name <- "BLUDB"
-host.name <- "19af6446-6171-4641-8aba-9dcff8e1b6ff.c1ogj3sd0t
-  gtu0lqde00.databases.appdomain.cloud"
+host.name <- "<YOURHOSTNAMEHERE>"
 port <-"30699" # 50000 if not using SSL or 50001 if using SSL
-user.name <-"vkj26480"
-user.pwd <- "PjtfHxJhreFiR28i"
+user.name <-"<YOURUSERNAMEHERE>"
+user.pwd <- "<YOURPASSWORDHERE>"
 con.text <- paste("CData DB2 Source;DRIVER=",driver.name,
                   ";Database=",db.name,
                   ";Hostname=",host.name,
