@@ -466,7 +466,15 @@ sqlQuery(conn,"SELECT CROP_TYPE,GEO,AVG(AVG_YIELD) AS TEN_YEAR_AVG_YIELD FROM CR
 
 ANSWER: 35,183,000 metric tons of wheat were harvested in Canada in the most recent year of the data (2020) from over 10,017,800 hectares of harvested land.
 
-```{r Exercise3_Problem12_run}
+```{r Exercise3_Problem12,eval=FALSE}
+
+sqlQuery(conn,"SELECT * FROM CROP_DATA 
+         WHERE GEO='Canada' and CROP_TYPE='Wheat' and 
+         YEAR = (SELECT MAX(YEAR) FROM CROP_DATA)")
+
+```
+
+```{r Exercise3_Problem12_run,echo=FALSE}
 
 sqlQuery(conn,"SELECT * FROM CROP_DATA WHERE GEO='Canada' and CROP_TYPE='Wheat' and YEAR = (SELECT MAX(YEAR) FROM CROP_DATA)")
 
